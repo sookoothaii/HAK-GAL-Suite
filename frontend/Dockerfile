@@ -16,8 +16,8 @@ RUN npm ci
 # Copy source code
 COPY . .
 
-# Build the application
-RUN npm run build
+# Build the application using npx to ensure vite is found
+RUN npx vite build
 
 # Serve stage
 FROM nginx:alpine
