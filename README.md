@@ -29,6 +29,7 @@ This repository contains the complete source code for the HAK-GAL engine, a refe
 - Node.js (with npm, yarn, or pnpm)
 - Docker & Docker Compose (recommended)
 - API keys for your LLM providers (e.g., OpenAI, Anthropic)
+- See [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) for contribution guidelines.
 
 ### Installation & Execution
 
