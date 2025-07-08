@@ -1,0 +1,42 @@
+# Backend .dockerignore
+
+# Virtual environment
+venv/
+env/
+.env
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+
+# Test files
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Git
+.git/
+.gitignore
