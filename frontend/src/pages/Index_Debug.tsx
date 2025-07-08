@@ -1,4 +1,4 @@
-// index.tsx
+// Verbesserte Index.tsx mit Debug-Features
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,6 +9,7 @@ import { Trash2, Plus, X, Send, ChevronDown, Upload, Loader2 } from "lucide-reac
 type Message = {
   type: "user" | "system";
   content: string;
+  timestamp?: string;
 };
 
 const Index = () => {
@@ -22,6 +23,10 @@ const Index = () => {
   const [learningSuggestions, setLearningSuggestions] = useState<string[]>([]);
   const [dataSources, setDataSources] = useState<string[]>([]);
   const [ragContext, setRagContext] = useState("No context loaded yet.");
+  
+  // DEBUG: State für Debugging
+  const [debugInfo, setDebugInfo] = useState<string>("");
+  const [lastApiResponse, setLastApiResponse] = useState<any>(null);
   
   const conversationEndRef = useRef<null | HTMLDivElement>(null);
 
@@ -42,8 +47,14 @@ const Index = () => {
     if (!commandString.trim() || isLoading) return;
 
     setIsLoading(true);
+    const userMessage: Message = { 
+      type: "user", 
+      content: commandString,
+      timestamp: new Date().toISOString()
+    };
+    
     setConversationHistory(prev => {
-      const newHistory = [...prev, { type: "user", content: commandString }];
+      const newHistory = [...prev, userMessage];
       console.log("✅ User Message hinzugefügt. Neue Länge:", newHistory.length);
       return newHistory;
     });
@@ -81,7 +92,12 @@ const Index = () => {
         suggestionsCount: data.learningSuggestions?.length || 0
       });
 
+      // DEBUG: Speichere letzte Response
+      setLastApiResponse(data);
+      setDebugInfo(`Last API: ${data.status}, Chat: ${!!data.chatResponse}, Knowledge: ${data.permanentKnowledge?.length || 0}`);
+
       if (data.status === "success") {
+        // Verbesserte State-Updates mit Validation
         console.log("🔄 Updating permanentKnowledge...");
         const newKnowledge = Array.isArray(data.permanentKnowledge) ? data.permanentKnowledge : [];
         setPermanentKnowledge(newKnowledge);
@@ -94,17 +110,28 @@ const Index = () => {
         
         if (data.chatResponse) {
           console.log("💬 Adding system message. Content length:", data.chatResponse.length);
+          const systemMessage: Message = {
+            type: "system",
+            content: data.chatResponse,
+            timestamp: new Date().toISOString()
+          };
+          
           setConversationHistory(prev => {
-            const newHistory = [...prev, { type: "system", content: data.chatResponse }];
+            const newHistory = [...prev, systemMessage];
             console.log("✅ System Message hinzugefügt. Neue Länge:", newHistory.length);
-            console.log("📝 Message Content Preview:", data.chatResponse.substring(0, 100) + "...");
+            console.log("📝 Message Content:", data.chatResponse.substring(0, 100) + "...");
             return newHistory;
           });
         } else {
           console.log("⚠️ Keine chatResponse erhalten, verwende Fallback");
+          const fallbackMessage: Message = {
+            type: "system",
+            content: `✅ Command '${commandString}' executed successfully.`,
+            timestamp: new Date().toISOString()
+          };
+          
           setConversationHistory(prev => {
-            const fallbackMessage = `✅ Command '${commandString}' executed successfully.`;
-            const newHistory = [...prev, { type: "system", content: fallbackMessage }];
+            const newHistory = [...prev, fallbackMessage];
             console.log("✅ Fallback Message hinzugefügt. Neue Länge:", newHistory.length);
             return newHistory;
           });
@@ -114,47 +141,69 @@ const Index = () => {
       }
 
     } catch (error) {
-      console.error("API call failed:", error);
+      console.error("💥 API call failed:", error);
       const errorResponse: Message = {
         type: "system",
         content: `🚨 Error: ${error.message}`,
+        timestamp: new Date().toISOString()
       };
-      setConversationHistory(prev => [...prev, errorResponse]);
+      setConversationHistory(prev => {
+        const newHistory = [...prev, errorResponse];
+        console.log("❌ Error Message hinzugefügt. Neue Länge:", newHistory.length);
+        return newHistory;
+      });
     } finally {
       setIsLoading(false);
+      console.log("🏁 Command processing completed");
     }
   };
 
-  const handleSendMessage = () => sendCommandToBackend(inputMessage);
-  const handleLearnAll = () => sendCommandToBackend("learn");
-  const handleRetractItem = (item: string) => sendCommandToBackend(`retract ${item}`);
+  const handleSendMessage = () => {
+    console.log("🎯 handleSendMessage called with:", inputMessage);
+    sendCommandToBackend(inputMessage);
+  };
+  
+  const handleLearnAll = () => {
+    console.log("🎯 handleLearnAll called");
+    sendCommandToBackend("learn");
+  };
+  
+  const handleRetractItem = (item: string) => {
+    console.log("🎯 handleRetractItem called with:", item);
+    sendCommandToBackend(`retract ${item}`);
+  };
 
   return (
     <div className="min-h-screen bg-gray-900 text-gray-200 font-sans">
       {/* DEBUG PANEL - Nur für Debugging */}
       <div className="bg-yellow-900/20 border-yellow-600/30 border p-2 text-xs text-yellow-200">
-        🔧 DEBUG: Messages: {conversationHistory.length} | Knowledge: {permanentKnowledge.length} | Suggestions: {learningSuggestions.length} | Loading: {isLoading ? "YES" : "NO"}
+        🔧 DEBUG: Messages: {conversationHistory.length} | Knowledge: {permanentKnowledge.length} | Suggestions: {learningSuggestions.length} | {debugInfo}
         <button 
-          onClick={() => console.log("Current State:", { conversationHistory, permanentKnowledge, learningSuggestions })}
-          className="ml-2 px-2 py-1 bg-yellow-600/20 rounded hover:bg-yellow-600/30"
+          onClick={() => console.log("Current State:", { conversationHistory, permanentKnowledge, learningSuggestions, lastApiResponse })}
+          className="ml-2 px-2 py-1 bg-yellow-600/20 rounded"
         >
           Log State
         </button>
       </div>
+      
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 p-4 h-screen">
         
         <Card className="bg-gray-800/50 border-gray-700 flex flex-col">
           <CardHeader><CardTitle className="text-gray-100">Knowledge Base</CardTitle></CardHeader>
           <CardContent className="flex-1 flex flex-col space-y-4 overflow-hidden">
             <div className="flex-1 flex flex-col">
-              <h3 className="text-sm font-medium mb-2 text-gray-400">Permanent Knowledge ({permanentKnowledge.length})</h3>
+              <h3 className="text-sm font-medium mb-2 text-gray-400">
+                Permanent Knowledge ({permanentKnowledge.length})
+              </h3>
               <ScrollArea className="flex-1 border border-gray-700 rounded p-2 bg-gray-900/50">
                 {permanentKnowledge.length > 0 ? (
                   <div className="space-y-2">
                     {permanentKnowledge.map((item, index) => (
                       <div key={`perm-${index}`} className="flex items-center justify-between text-sm p-2 bg-gray-800 rounded">
-                        <span className="flex-1 truncate font-mono text-xs">{item}</span>
-                        <Button variant="ghost" size="sm" onClick={() => handleRetractItem(item)} className="ml-2 h-6 w-6 p-0 text-gray-400 hover:text-red-400"><Trash2 className="h-3 w-3" /></Button>
+                        <span className="flex-1 truncate font-mono text-xs">{String(item)}</span>
+                        <Button variant="ghost" size="sm" onClick={() => handleRetractItem(String(item))} className="ml-2 h-6 w-6 p-0 text-gray-400 hover:text-red-400">
+                          <Trash2 className="h-3 w-3" />
+                        </Button>
                       </div>
                     ))}
                   </div>
@@ -162,16 +211,20 @@ const Index = () => {
               </ScrollArea>
             </div>
             <div className="flex-1 flex flex-col">
-              <h3 className="text-sm font-medium mb-2 text-gray-400">Learning Suggestions ({learningSuggestions.length})</h3>
+              <h3 className="text-sm font-medium mb-2 text-gray-400">
+                Learning Suggestions ({learningSuggestions.length})
+              </h3>
               <ScrollArea className="flex-1 border border-gray-700 rounded p-2 bg-gray-900/50">
                 {learningSuggestions.length > 0 ? (
                   <div className="space-y-2">
                     {learningSuggestions.map((item, index) => (
                       <div key={`learn-${index}`} className="flex items-center justify-between text-sm p-2 bg-gray-800 rounded">
-                        <span className="flex-1 truncate font-mono text-xs">{item}</span>
+                        <span className="flex-1 truncate font-mono text-xs">{String(item)}</span>
                       </div>
                     ))}
-                    <Button variant="outline" size="sm" className="w-full mt-2 border-green-500/50 text-green-400 hover:bg-green-500/10" onClick={handleLearnAll}>Learn All Suggestions</Button>
+                    <Button variant="outline" size="sm" className="w-full mt-2 border-green-500/50 text-green-400 hover:bg-green-500/10" onClick={handleLearnAll}>
+                      Learn All Suggestions
+                    </Button>
                   </div>
                 ) : <p className="text-xs text-gray-500 text-center p-4">No new facts to learn.</p>}
               </ScrollArea>
@@ -179,8 +232,12 @@ const Index = () => {
             <div>
               <h3 className="text-sm font-medium mb-2 text-gray-400">Data Sources</h3>
               <div className="space-y-2">
-                {dataSources.map((file, index) => (<div key={index} className="text-xs p-2 bg-gray-800 rounded truncate">{file}</div>))}
-                <Button variant="outline" size="sm" className="w-full border-gray-700 hover:bg-gray-700"><Upload className="h-3 w-3 mr-1" />Upload Document</Button>
+                {dataSources.map((file, index) => (
+                  <div key={index} className="text-xs p-2 bg-gray-800 rounded truncate">{file}</div>
+                ))}
+                <Button variant="outline" size="sm" className="w-full border-gray-700 hover:bg-gray-700">
+                  <Upload className="h-3 w-3 mr-1" />Upload Document
+                </Button>
               </div>
             </div>
           </CardContent>
@@ -192,38 +249,75 @@ const Index = () => {
             <ScrollArea className="flex-1 mb-4 pr-4">
               <div className="space-y-4">
                 {conversationHistory.map((message, index) => (
-                  <div key={index} className={`p-3 rounded-lg border ${message.type === 'user' ? 'bg-blue-500/10 border-blue-500/20 text-blue-300' : 'bg-gray-800 border-gray-700'}`}>
+                  <div key={`msg-${index}-${message.timestamp}`} className={`p-3 rounded-lg border ${
+                    message.type === 'user' 
+                      ? 'bg-blue-500/10 border-blue-500/20 text-blue-300' 
+                      : 'bg-gray-800 border-gray-700'
+                  }`}>
                     <div className="flex items-start gap-3">
                       <span className="mt-1">{message.type === 'user' ? '👤' : '🤖'}</span>
-                      <pre className="flex-1 whitespace-pre-wrap font-sans text-sm">{message.content}</pre>
+                      <div className="flex-1">
+                        <pre className="whitespace-pre-wrap font-sans text-sm">{message.content}</pre>
+                        {message.timestamp && (
+                          <div className="text-xs text-gray-500 mt-1">
+                            {new Date(message.timestamp).toLocaleTimeString()}
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
                 ))}
-                {isLoading && <div className="flex justify-center items-center p-4"><Loader2 className="h-6 w-6 animate-spin text-blue-400" /></div>}
+                {isLoading && (
+                  <div className="flex justify-center items-center p-4">
+                    <Loader2 className="h-6 w-6 animate-spin text-blue-400" />
+                    <span className="ml-2 text-sm text-gray-400">Processing...</span>
+                  </div>
+                )}
                 <div ref={conversationEndRef} />
               </div>
             </ScrollArea>
             <div className="flex gap-2 pt-4 border-t border-gray-700">
-              <Input value={inputMessage} onChange={(e) => setInputMessage(e.target.value)} placeholder="Enter command or ask a question..." onKeyPress={(e) => e.key === "Enter" && handleSendMessage()} className="flex-1 bg-gray-800 border-gray-600 focus:ring-blue-500" />
-              <Button onClick={handleSendMessage} disabled={isLoading} className="bg-blue-600 hover:bg-blue-700 text-white"><Send className="h-4 w-4" /></Button>
+              <Input 
+                value={inputMessage} 
+                onChange={(e) => setInputMessage(e.target.value)} 
+                placeholder="Enter command or ask a question..." 
+                onKeyPress={(e) => e.key === "Enter" && !isLoading && handleSendMessage()} 
+                className="flex-1 bg-gray-800 border-gray-600 focus:ring-blue-500"
+                disabled={isLoading}
+              />
+              <Button 
+                onClick={handleSendMessage} 
+                disabled={isLoading || !inputMessage.trim()} 
+                className="bg-blue-600 hover:bg-blue-700 text-white"
+              >
+                <Send className="h-4 w-4" />
+              </Button>
             </div>
           </CardContent>
         </Card>
 
         <Card className="bg-gray-800/50 border-gray-700 flex flex-col">
-          <CardHeader><CardTitle className="text-gray-100">{rightPanelView === "rag" ? "RAG Context" : `Profile: ${profileEntity}`}</CardTitle></CardHeader>
+          <CardHeader><CardTitle className="text-gray-100">
+            {rightPanelView === "rag" ? "RAG Context" : `Profile: ${profileEntity}`}
+          </CardTitle></CardHeader>
           <CardContent className="flex-1 overflow-hidden">
             {rightPanelView === "rag" ? (
-              <ScrollArea className="h-full"><div className="text-sm whitespace-pre-wrap font-mono text-gray-400">{ragContext}</div></ScrollArea>
+              <ScrollArea className="h-full">
+                <div className="text-sm whitespace-pre-wrap font-mono text-gray-400">{ragContext}</div>
+              </ScrollArea>
             ) : (
               <div className="space-y-4">
                 <div>
                   <h3 className="text-sm font-medium mb-2 text-gray-400">Explicit Facts</h3>
-                  <div className="space-y-1 text-xs font-mono"><div className="p-2 bg-gray-800 rounded">Not yet implemented.</div></div>
+                  <div className="space-y-1 text-xs font-mono">
+                    <div className="p-2 bg-gray-800 rounded">Not yet implemented.</div>
+                  </div>
                 </div>
                 <div>
                   <h3 className="text-sm font-medium mb-2 text-gray-400">Derived Properties</h3>
-                  <div className="space-y-1 text-xs font-mono"><div className="p-2 bg-gray-800 rounded">Not yet implemented.</div></div>
+                  <div className="space-y-1 text-xs font-mono">
+                    <div className="p-2 bg-gray-800 rounded">Not yet implemented.</div>
+                  </div>
                 </div>
               </div>
             )}

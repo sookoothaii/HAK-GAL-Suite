@@ -13,8 +13,18 @@ from backend.Xk_assistant_v41_antlr_parser_HHHHXXXXXXX import KAssistant
 
 # --- Initialisierung ---
 app = Flask(__name__)
-origins = ["http://localhost:3000", "http://localhost:8080", "http://localhost:8081", "http://localhost:5173"]
-CORS(app, resources={r"/api/*": {"origins": origins}})
+origins = [
+    "http://localhost:3000", "http://localhost:8080", "http://localhost:8081", "http://localhost:5173",
+    "http://127.0.0.1:3000", "http://127.0.0.1:8080", "http://127.0.0.1:8081", "http://127.0.0.1:5173"
+]
+CORS(app, resources={
+    r"/api/*": {
+        "origins": origins,
+        "methods": ["GET", "POST", "OPTIONS"],
+        "allow_headers": ["Content-Type", "Authorization"],
+        "supports_credentials": True
+    }
+})
 
 print("🤖 Initialisiere K-Assistant... Bitte warten.")
 assistant = KAssistant()
@@ -37,9 +47,26 @@ def capture_output(func, *args, **kwargs):
     sys.stdout = old_stdout
     return captured_output.getvalue()
 
+# --- Debug-Endpunkt ---
+@app.route('/api/test', methods=['GET'])
+def test_connection():
+    return jsonify({
+        "status": "Backend läuft!",
+        "cors_origins": origins,
+        "backend_ready": True
+    })
+
 # --- API-Endpunkt ---
-@app.route('/api/command', methods=['POST'])
+@app.route('/api/command', methods=['POST', 'OPTIONS'])
 def handle_command():
+    # CORS Preflight Request
+    if request.method == 'OPTIONS':
+        return '', 200
+    
+    # Request-Logging für Debugging
+    print(f"🔍 Request von: {request.origin}")
+    print(f"🔍 Headers: {dict(request.headers)}")
+    
     data = request.get_json()
     if not data or 'command' not in data:
         return jsonify({"error": "Ungültige Anfrage: 'command' fehlt."}), 400
@@ -48,18 +75,26 @@ def handle_command():
     parts = full_command.split(" ", 1)
     command = parts[0].lower()
     args = parts[1] if len(parts) > 1 else ""
+    
+    print(f"📨 Command empfangen: '{command}' mit Args: '{args}'")
 
     try:
         response_data = {}
         chat_response = None
 
         if command in ["add_raw", "retract", "learn", "build_kb", "clearcache"]:
-            # Befehle, die nur den Zustand ändern
-            if command == "add_raw": assistant.add_raw(args)
-            elif command == "retract": assistant.retract(args)
-            elif command == "learn": assistant.learn_facts()
-            elif command == "build_kb": assistant.build_kb_from_file(args)
-            elif command == "clearcache": assistant.clear_cache()
+            # Befehle, die den Zustand ändern UND Ausgaben haben
+            print(f"🔧 Verarbeite State-Change Command: {command}")
+            if command == "add_raw": 
+                chat_response = capture_output(assistant.add_raw, args)
+            elif command == "retract": 
+                chat_response = capture_output(assistant.retract, args)
+            elif command == "learn": 
+                chat_response = capture_output(assistant.learn_facts)
+            elif command == "build_kb": 
+                chat_response = capture_output(assistant.build_kb_from_file, args)
+            elif command == "clearcache": 
+                chat_response = capture_output(assistant.clear_cache)
         
         elif command in ["ask", "explain", "what_is", "show", "status"]:
              # Befehle, die eine Text-Antwort erzeugen
