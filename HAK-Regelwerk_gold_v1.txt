@@ -1,0 +1,10 @@
+gold_standard_facts = [
+    "all x (IstCobolMainframe(x) -> IstLegacySystem(x)).",
+    "IstJavaMicroservice(LogistikTool).",
+    "-IstLegacySystem(LogistikTool).",
+    "all x (IstCobolMainframe(x) -> HatHoheBetriebskosten(x)).",
+    "HatNiedrigeBetriebskosten(BillingSystem).",
+    "all x (IstLegacySystem(x) & HatHoheBetriebskosten(x) -> SollteRefactoredWerden(x)).",
+    "IstCobolMainframe(UserManagement).",
+    "-HatAktuelleBetriebskostenDaten(UserManagement)."
+]

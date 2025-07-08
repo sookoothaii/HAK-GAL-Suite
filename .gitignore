@@ -1,3 +1,4 @@
+
 # Logs
 logs
 *.log
@@ -137,3 +138,48 @@ dist
 # Vite logs files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+.env
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Project specific
+*.log
+*.db
+*.sqlite
+knowledge_base.pkl
+proof_cache.pkl
+learning_suggestions.pkl
+
+# Build outputs
+dist/
+build/
+*.egg-info/
+frontend/dist/
+frontend/.next/
+

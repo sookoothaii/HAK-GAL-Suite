@@ -1,0 +1,186 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;600&display=swap');
+
+@layer base {
+  :root {
+    /* HAK/GAL Scientific Theme - Light Mode */
+    --background: 218 23% 97%;
+    --foreground: 218 17% 12%;
+    --card: 0 0% 100%;
+    --card-foreground: 218 17% 12%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 218 17% 12%;
+    
+    /* Scientific Blue Palette */
+    --primary: 218 89% 51%;
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 218 89% 61%;
+    --primary-muted: 218 45% 85%;
+    
+    /* Neural Network Inspired Accents */
+    --secondary: 264 83% 57%;
+    --secondary-foreground: 0 0% 100%;
+    --accent: 176 77% 47%;
+    --accent-foreground: 0 0% 100%;
+    
+    /* Muted Grays */
+    --muted: 218 15% 95%;
+    --muted-foreground: 218 11% 45%;
+    --border: 218 20% 88%;
+    --input: 218 20% 88%;
+    --ring: 218 89% 51%;
+    
+    /* Status Colors */
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --unknown: 218 11% 65%;
+    --unknown-foreground: 0 0% 100%;
+    
+    /* Scientific Gradients */
+    --gradient-neural: linear-gradient(135deg, hsl(218 89% 51%), hsl(264 83% 57%));
+    --gradient-data: linear-gradient(90deg, hsl(176 77% 47%), hsl(218 89% 61%));
+    --gradient-logic: linear-gradient(45deg, hsl(264 83% 57%), hsl(218 89% 51%));
+    
+    /* Shadows & Effects */
+    --shadow-neural: 0 8px 32px -8px hsl(218 89% 51% / 0.3);
+    --shadow-glow: 0 0 20px hsl(218 89% 61% / 0.4);
+    --shadow-card: 0 4px 24px -4px hsl(218 17% 12% / 0.1);
+    
+    /* Animations */
+    --transition-neural: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-smooth: all 0.2s ease-out;
+    
+    --radius: 0.75rem;
+    --sidebar-background: 218 23% 97%;
+    --sidebar-foreground: 218 17% 12%;
+    --sidebar-primary: 218 89% 51%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 218 15% 95%;
+    --sidebar-accent-foreground: 218 17% 12%;
+    --sidebar-border: 218 20% 88%;
+    --sidebar-ring: 218 89% 51%;
+  }
+
+  .dark {
+    /* HAK/GAL Scientific Theme - Dark Mode */
+    --background: 218 27% 6%;
+    --foreground: 218 15% 92%;
+    --card: 218 23% 8%;
+    --card-foreground: 218 15% 92%;
+    --popover: 218 23% 8%;
+    --popover-foreground: 218 15% 92%;
+    
+    /* Enhanced Scientific Blue Palette */
+    --primary: 218 89% 61%;
+    --primary-foreground: 218 27% 6%;
+    --primary-glow: 218 89% 71%;
+    --primary-muted: 218 45% 25%;
+    
+    /* Neural Network Inspired Accents */
+    --secondary: 264 83% 67%;
+    --secondary-foreground: 218 27% 6%;
+    --accent: 176 77% 57%;
+    --accent-foreground: 218 27% 6%;
+    
+    /* Professional Dark Grays */
+    --muted: 218 15% 12%;
+    --muted-foreground: 218 11% 65%;
+    --border: 218 15% 15%;
+    --input: 218 15% 15%;
+    --ring: 218 89% 61%;
+    
+    /* Enhanced Status Colors */
+    --success: 142 76% 46%;
+    --success-foreground: 218 27% 6%;
+    --warning: 38 92% 60%;
+    --warning-foreground: 218 27% 6%;
+    --destructive: 0 84% 70%;
+    --destructive-foreground: 218 27% 6%;
+    --unknown: 218 11% 55%;
+    --unknown-foreground: 218 27% 6%;
+    
+    /* Enhanced Scientific Gradients */
+    --gradient-neural: linear-gradient(135deg, hsl(218 89% 61%), hsl(264 83% 67%));
+    --gradient-data: linear-gradient(90deg, hsl(176 77% 57%), hsl(218 89% 71%));
+    --gradient-logic: linear-gradient(45deg, hsl(264 83% 67%), hsl(218 89% 61%));
+    
+    /* Enhanced Shadows & Effects */
+    --shadow-neural: 0 8px 32px -8px hsl(218 89% 61% / 0.4);
+    --shadow-glow: 0 0 32px hsl(218 89% 71% / 0.5);
+    --shadow-card: 0 4px 24px -4px hsl(218 27% 6% / 0.4);
+    
+    --sidebar-background: 218 23% 8%;
+    --sidebar-foreground: 218 15% 92%;
+    --sidebar-primary: 218 89% 61%;
+    --sidebar-primary-foreground: 218 27% 6%;
+    --sidebar-accent: 218 15% 12%;
+    --sidebar-accent-foreground: 218 15% 92%;
+    --sidebar-border: 218 15% 15%;
+    --sidebar-ring: 218 89% 61%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    class: "dark";
+  }
+
+  /* Typography */
+  .font-mono {
+    font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', Consolas, monospace;
+  }
+
+  .font-sans {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+
+  /* Neural Network Inspired Elements */
+  .neural-glow {
+    box-shadow: var(--shadow-glow);
+  }
+
+  .neural-border {
+    border: 1px solid hsl(var(--primary) / 0.3);
+    background: linear-gradient(135deg, 
+      hsl(var(--primary) / 0.05),
+      hsl(var(--secondary) / 0.05)
+    );
+  }
+
+  /* Code and Logic Elements */
+  .logic-display {
+    @apply font-mono text-sm;
+    background: hsl(var(--muted));
+    border: 1px solid hsl(var(--border));
+    border-radius: var(--radius);
+    padding: 1rem;
+  }
+
+  /* Scientific Data Styling */
+  .data-chip {
+    @apply inline-flex items-center rounded-full px-3 py-1 text-xs font-medium;
+    background: hsl(var(--primary) / 0.1);
+    color: hsl(var(--primary));
+    border: 1px solid hsl(var(--primary) / 0.2);
+  }
+
+  /* Smooth Transitions */
+  .transition-neural {
+    transition: var(--transition-neural);
+  }
+
+  .transition-smooth {
+    transition: var(--transition-smooth);
+  }
+}
