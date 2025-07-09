@@ -1,0 +1,75 @@
+# HAK-GAL Suite Requirements
+# Basis-Abhängigkeiten für das HAK-GAL System
+
+# ==============================================================================
+# KERN-ABHÄNGIGKEITEN (ERFORDERLICH)
+# ==============================================================================
+
+# Logik und Reasoning
+z3-solver>=4.12.0           # SMT Solver für formale Logik
+lark>=1.1.0                 # Parser für HAK-GAL Grammatik
+
+# LLM-Provider
+openai>=1.0.0               # Für DeepSeek und Mistral APIs
+google-generativeai>=0.3.0  # Für Google Gemini
+
+# Umgebungsvariablen
+python-dotenv>=1.0.0        # .env Datei Unterstützung
+
+# ==============================================================================
+# RAG-SYSTEM (OPTIONAL, ABER EMPFOHLEN)
+# ==============================================================================
+
+# Vektorsuche und Embeddings
+sentence-transformers>=2.2.0   # Für Textembeddings
+faiss-cpu>=1.7.0               # Für effiziente Vektorsuche
+numpy>=1.21.0                  # Numerische Operationen
+
+# Dokumentverarbeitung
+pypdf>=3.0.0                   # PDF-Dateien lesen
+
+# ==============================================================================
+# WOLFRAM|ALPHA INTEGRATION (NEU - OPTIONAL)
+# ==============================================================================
+
+# Wolfram Alpha API Client
+wolframalpha>=5.0.0            # Offizielle Wolfram Alpha Bibliothek
+
+# ==============================================================================
+# ENTWICKLUNG UND TESTING (OPTIONAL)
+# ==============================================================================
+
+# Testing Framework
+pytest>=7.0.0                 # Für Unittests
+pytest-cov>=4.0.0            # Code-Coverage
+
+# Code-Qualität
+black>=23.0.0                 # Code-Formatierung
+flake8>=6.0.0                 # Linting
+mypy>=1.0.0                   # Type-Checking
+
+# ==============================================================================
+# SYSTEM-SPEZIFISCHE ABHÄNGIGKEITEN
+# ==============================================================================
+
+# Windows-spezifisch (automatisch installiert wenn nötig)
+# pywin32>=306                 # Für Windows-Shell Integration
+
+# ==============================================================================
+# INSTALLATIONS-HINWEISE
+# ==============================================================================
+
+# Basis-Installation (minimal funktional):
+# pip install z3-solver lark openai python-dotenv
+
+# Vollständige Installation (empfohlen):
+# pip install -r requirements.txt
+
+# Nur Wolfram-Integration hinzufügen:
+# pip install wolframalpha
+
+# RAG-System hinzufügen:
+# pip install sentence-transformers faiss-cpu numpy pypdf
+
+# Entwicklungsumgebung:
+# pip install -r requirements.txt pytest pytest-cov black flake8 mypy

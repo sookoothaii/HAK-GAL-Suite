@@ -1,0 +1,125 @@
+HAK-GAL Framework Faktenkompendium
+=========================================
+
+VERSION: 1.0
+DATUM: Juli 2025
+ZWECK: Validierte Antworten auf häufige Projektfragen
+
+=========================================
+GRUNDLEGENDE DEFINITIONEN
+=========================================
+
+Das HAK-GAL (Hybrid Assertion Knowledge & Grounded Assertion Logic) Framework ist ein innovatives System zur Verifikation von KI-generierten Inhalten.
+
+Es kombiniert die Flexibilität von Large Language Models mit der Präzision symbolischer Logik.
+
+Das Framework wurde entwickelt, um vertrauenswürdige AI-Systeme zu schaffen, die ihre Ausgaben formal verifizieren können.
+
+=========================================
+SYSTEMARCHITEKTUR
+=========================================
+
+Hauptkomponenten:
+- LLM-Integration für natürliche Sprachverarbeitung
+- Z3 SMT Solver für formale Beweise  
+- RAG-Pipeline für Dokumentenindizierung
+- Wissensbasis für Faktenspeicherung
+- Ensemble-Manager für Multi-Provider-Integration
+- Shell-Manager für Systemintegration
+- Parser für HAK-GAL Syntax-Validierung
+
+Technischer Stack:
+- Backend: Python 3.13+ mit FastAPI/Flask
+- Frontend: React/TypeScript mit modernem UI
+- Beweissystem: Z3 SMT Solver
+- LLM-Provider: DeepSeek, Mistral, Gemini
+- RAG-System: SentenceTransformers + FAISS
+- Parser: Lark mit LALR-Grammatik
+
+=========================================
+KERNFUNKTIONALITÄTEN
+=========================================
+
+Das System bietet folgende Hauptfunktionen:
+- Wissenschaftliche Verifikation von Aussagen
+- Compliance-Checking für regulatorische Anforderungen
+- Automatisierte Faktenfindung aus Dokumenten
+- Logische Konsistenzprüfung von Wissensbasen
+- Natürlichsprachliche Anfragen mit formaler Validierung
+- Dokumentenindizierung und semantische Suche
+- Multi-Provider LLM-Integration mit Fallback-Mechanismen
+
+=========================================
+ANWENDUNGSGEBIETE
+=========================================
+
+Primäre Einsatzbereiche:
+- Forschungsverifikation: Automatische Prüfung wissenschaftlicher Aussagen
+- Unternehmens-Compliance: Regelkonformität in komplexen Organisationen
+- Wissensmanagement: Strukturierte Speicherung und Abruf von Unternehmenswissen
+- Qualitätssicherung: Verifikation von KI-generierten Inhalten
+- Dokumentenanalyse: Extraktion und Verifikation von Fakten aus großen Textkorpora
+
+=========================================
+HAK-GAL SYNTAX & LOGIK
+=========================================
+
+Syntax-Grundlagen:
+- Prädikate in PascalCase: IstLegacy(System)
+- Konstanten in PascalCase: UserManagement, BillingSystem
+- Variablen in lowercase: x, y, z
+- Quantoren: all x (Regel(x))
+- Operatoren: & (AND), | (OR), -> (IMPLIES), - (NOT)
+- Terminierung: Jede Formel endet mit Punkt "."
+
+Beispiele valider Formeln:
+- IstLegacy(UserManagement).
+- all x (IstLegacy(x) -> SollteRefactoredWerden(x)).
+- HatKomponente(HAKGALFramework, RAGPipeline).
+- -IstStabil(AltesDatenbanksystem).
+
+=========================================
+PROVER-SYSTEM
+=========================================
+
+Zweistufige Prover-Kaskade:
+1. Pattern Matcher: Schnelle exakte Übereinstimmungen
+2. Z3 SMT Solver: Formale logische Beweise
+
+Proof-Cache für Performance-Optimierung.
+Konsistenzprüfung vor Hinzufügung neuer Fakten.
+Automatische Syntaxkorrektur für häufige Fehler.
+
+=========================================
+RAG-PIPELINE DETAILS
+=========================================
+
+Funktionsweise:
+1. Dokumentenindizierung mit SentenceTransformers
+2. Semantische Ähnlichkeitssuche mit FAISS
+3. Chunk-basierte Textverarbeitung
+4. Ensemble-basierte Faktextraktion
+5. Automatische Integration in Wissensbasis
+
+Unterstützte Dateiformate:
+- PDF-Dokumente
+- Plain Text (.txt)
+- Markdown (.md)
+
+=========================================
+LLM-ENSEMBLE MANAGEMENT
+=========================================
+
+Veto-Ensemble-Architektur:
+- Mistral als "Chef" mit Veto-Recht
+- DeepSeek und Gemini als Backup-Provider
+- Automatischer Fallback bei API-Limits
+- Konsens-basierte Entscheidungsfindung
+- Rate-Limiting und Error-Handling
+
+=========================================
+BENUTZERINTERFACE
+=========================================
+
+Drei-Panel Design:
+- Knowledge Base Panel: Permanente Fakten und Learning

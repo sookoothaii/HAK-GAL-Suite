@@ -5,8 +5,8 @@ import traceback
 import io
 import sys
 
-# Backend-Import anpassen (falls nötig)
-from backend.Xk_assistant_v41_antlr_parser_HHHHXXXXXXX import KAssistant
+# ✅ AKTUALISIERT: Import der neuen Hauptdatei
+from backend.k_assistant_main import KAssistant
 
 # --- Initialisierung ---
 app = Flask(__name__)

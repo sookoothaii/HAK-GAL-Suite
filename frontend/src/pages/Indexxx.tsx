@@ -32,7 +32,6 @@ const Index = () => {
   const [learningSuggestions, setLearningSuggestions] = useState<string[]>([]);
   const [dataSources, setDataSources] = useState<string[]>([]);
   const [ragContext, setRagContext] = useState("No context loaded yet.");
-  const [llmStatus, setLlmStatus] = useState<{llm_count: number, llm_active: number, llm_providers: any[]}>({llm_count: 0, llm_active: 0, llm_providers: []});
   
   const conversationEndRef = useRef<null | HTMLDivElement>(null);
 
@@ -124,13 +123,6 @@ const Index = () => {
           console.log("🔄 Updating Data Sources...");
           setDataSources(data.dataSources);
           console.log("✅ Data Sources updated:", data.dataSources.length, "items");
-        }
-        
-        // Update LLM Status
-        if (data.llmStatus) {
-          console.log("🔄 Updating LLM Status...");
-          setLlmStatus(data.llmStatus);
-          console.log("✅ LLM Status updated:", data.llmStatus.llm_active + "/" + data.llmStatus.llm_count, "active");
         }
         
         // EXPLIZITE Learning Suggestions Check
@@ -244,13 +236,6 @@ const Index = () => {
             <Database className="h-3 w-3" />
             Docs: {dataSources.length}
           </Badge>
-          {/* NEUE LLM-Status-Anzeige */}
-          <Badge 
-            variant={llmStatus.llm_active > 0 ? "default" : "destructive"} 
-            className="flex items-center gap-1"
-          >
-            🤖 LLM: {llmStatus.llm_active}/{llmStatus.llm_count}
-          </Badge>
           <Button
             variant="outline"
             size="sm"
@@ -293,27 +278,19 @@ const Index = () => {
         >
           Refresh
         </button>
-        <button 
-          onClick={() => sendCommandToBackend("help")}
-          className="ml-2 px-2 py-1 rounded hover:opacity-80"
-          style={{ backgroundColor: theme.colors.success + '20' }}
-        >
-          Test Commands
-        </button>
       </div>
       
-      {/* KRITISCHE LAYOUT-REPARATUR: Flexbox statt Grid */}
-      <div className="flex-1 flex flex-col lg:flex-row gap-6 p-6 overflow-hidden">
+      {/* Main Content Grid - FLEX-GROW */}
+      <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-6 p-6 min-h-0">
         
-        {/* Knowledge Base Panel - 1/3 WIDTH, FULL HEIGHT */}
-        <div className="flex-1 flex flex-col overflow-hidden">
-          <Card 
-            className="flex flex-col border h-full"
-            style={{ 
-              backgroundColor: theme.colors.surface,
-              borderColor: theme.colors.border
-            }}
-          >
+        {/* Knowledge Base Panel - SCROLLABLE CONTENT */}
+        <Card 
+          className="flex flex-col border h-full"
+          style={{ 
+            backgroundColor: theme.colors.surface,
+            borderColor: theme.colors.border
+          }}
+        >
           <CardHeader className="pb-4 flex-shrink-0">
             <CardTitle className="flex items-center gap-2" style={{ color: theme.colors.text }}>
               <Database className="h-5 w-5" style={{ color: theme.colors.primary }} />
@@ -461,17 +438,15 @@ const Index = () => {
             </div>
           </CardContent>
         </Card>
-        </div>
 
-        {/* Interaction Panel - 1/3 WIDTH, FULL HEIGHT */}
-        <div className="flex-1 flex flex-col overflow-hidden">
-          <Card 
-            className="flex flex-col border h-full"
-            style={{ 
-              backgroundColor: theme.colors.surface,
-              borderColor: theme.colors.border
-            }}
-          >
+        {/* Interaction Panel */}
+        <Card 
+          className="flex flex-col border"
+          style={{ 
+            backgroundColor: theme.colors.surface,
+            borderColor: theme.colors.border
+          }}
+        >
           <CardHeader className="pb-4">
             <CardTitle className="flex items-center gap-2" style={{ color: theme.colors.text }}>
               <MessageSquare className="h-5 w-5" style={{ color: theme.colors.primary }} />
@@ -563,17 +538,15 @@ const Index = () => {
             </div>
           </CardContent>
         </Card>
-        </div>
 
-        {/* RAG Context Panel - 1/3 WIDTH, FULL HEIGHT */}
-        <div className="flex-1 flex flex-col overflow-hidden">
-          <Card 
-            className="flex flex-col border h-full"
-            style={{ 
-              backgroundColor: theme.colors.surface,
-              borderColor: theme.colors.border
-            }}
-          >
+        {/* RAG Context Panel - KORRIGIERT FÜR HORIZONTAL SCROLLING */}
+        <Card 
+          className="flex flex-col border"
+          style={{ 
+            backgroundColor: theme.colors.surface,
+            borderColor: theme.colors.border
+          }}
+        >
           <CardHeader className="pb-4">
             <CardTitle className="flex items-center gap-2" style={{ color: theme.colors.text }}>
               <Settings className="h-5 w-5" style={{ color: theme.colors.primary }} />
@@ -639,7 +612,6 @@ const Index = () => {
             )}
           </CardContent>
         </Card>
-        </div>
       </div>
     </div>
   );

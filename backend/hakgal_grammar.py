@@ -1,5 +1,4 @@
-# hakgal_grammar.py (Version 4.1 - Unicode Support)
-# Fügt Unterstützung für deutsche Umlaute und Eszett in Prädikatnamen hinzu.
+# file: hakgal_grammar.py
 
 HAKGAL_GRAMMAR = r"""
     ?start: formula
@@ -29,7 +28,8 @@ HAKGAL_GRAMMAR = r"""
     
     ?term: PREDICATE | VAR
 
-    PREDICATE: /[A-ZÄÖÜ][a-zA-ZÄÖÜäöüß0-9_]*/
+    // MODIFIED: Added the hyphen '-' to the character set for subsequent characters.
+    PREDICATE: /[A-ZÄÖÜ][a-zA-ZÄÖÜäöüß0-9_-]*/
     VAR: /[a-z][a-zA-Z0-9_]*/
 
     %import common.WS

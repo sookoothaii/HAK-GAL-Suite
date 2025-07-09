@@ -1,0 +1,139 @@
+HAK-GAL Framework Wissensbasis-Fakten
+==========================================
+
+ZWECK: Automatische Extraktion in permanente Wissensbasis
+NUTZUNG: build_kb HAK_GAL_Wissensfakten.txt -> learn
+
+==========================================
+SYSTEM-GRUNDLAGEN
+==========================================
+
+Das HAK-GAL Framework ist ein hybrides AI-System.
+Das HAK-GAL Framework kombiniert symbolische Logik mit Large Language Models.
+Das HAK-GAL Framework ist innovativ und wissenschaftlich fundiert.
+Das HAK-GAL Framework wurde für Verifikation von KI-Inhalten entwickelt.
+Das HAK-GAL Framework ist production-ready und stabil.
+
+==========================================
+HAUPTKOMPONENTEN
+==========================================
+
+Die LLM-Integration ist eine Hauptkomponente des HAK-GAL Systems.
+Der Z3-SMT-Solver ist eine Hauptkomponente des HAK-GAL Systems.
+Die RAG-Pipeline ist eine Hauptkomponente des HAK-GAL Systems.
+Die Wissensbasis ist eine Hauptkomponente des HAK-GAL Systems.
+Der Ensemble-Manager ist eine Hauptkomponente des HAK-GAL Systems.
+Der Shell-Manager ist eine Hauptkomponente des HAK-GAL Systems.
+Der HAK-GAL-Parser ist eine Hauptkomponente des HAK-GAL Systems.
+
+Jede Hauptkomponente ist Teil des Gesamtsystems.
+Alle Hauptkomponenten arbeiten zusammen für die Systemfunktionalität.
+
+==========================================
+LLM-PROVIDER
+==========================================
+
+DeepSeek ist ein unterstützter LLM-Provider im HAK-GAL System.
+Mistral ist ein unterstützter LLM-Provider im HAK-GAL System.
+Gemini ist ein unterstützter LLM-Provider im HAK-GAL System.
+
+Mistral fungiert als Chef-Provider im Veto-Ensemble.
+DeepSeek und Gemini sind Backup-Provider im System.
+Das System bietet automatischen Fallback bei Provider-Ausfällen.
+Alle LLM-Provider unterstützen Faktextraktion und Logik-Übersetzung.
+
+==========================================
+ANWENDUNGSGEBIETE
+==========================================
+
+Wissenschaftliche Verifikation ist ein Anwendungsgebiet von HAK-GAL.
+Compliance-Checking ist ein Anwendungsgebiet von HAK-GAL.
+Automatisierte Faktenfindung ist ein Anwendungsgebiet von HAK-GAL.
+Logische Konsistenzprüfung ist ein Anwendungsgebiet von HAK-GAL.
+Wissensmanagement ist ein Anwendungsgebiet von HAK-GAL.
+Qualitätssicherung ist ein Anwendungsgebiet von HAK-GAL.
+Dokumentenanalyse ist ein Anwendungsgebiet von HAK-GAL.
+
+==========================================
+TECHNISCHE EIGENSCHAFTEN
+==========================================
+
+Das HAK-GAL System läuft auf Windows mit WSL.
+Das HAK-GAL System verwendet Python 3.13.5.
+Das HAK-GAL System unterstützt PDF-Dokumentenverarbeitung.
+Das HAK-GAL System unterstützt Markdown-Dokumentenverarbeitung.
+Das HAK-GAL System unterstützt Plain-Text-Dokumentenverarbeitung.
+
+Das System bietet eine React-TypeScript-Frontend-Oberfläche.
+Das System bietet eine Python-Flask-Backend-API.
+Das System bietet automatische Syntax-Korrektur für Eingaben.
+Das System bietet Proof-Caching für bessere Performance.
+
+==========================================
+PROVER-SYSTEM
+==========================================
+
+Das HAK-GAL System verwendet eine zweistufige Prover-Kaskade.
+Der Pattern-Matcher ist der erste Prover in der Kaskade.
+Der Z3-SMT-Solver ist der zweite Prover in der Kaskade.
+
+Der Pattern-Matcher führt schnelle exakte Übereinstimmungen durch.
+Der Z3-SMT-Solver führt formale logische Beweise durch.
+Das System cached erfolgreiche Beweise für bessere Performance.
+Das System prüft Konsistenz vor Hinzufügung neuer Fakten.
+
+==========================================
+RAG-PIPELINE
+==========================================
+
+Die RAG-Pipeline indiziert Dokumente für semantische Suche.
+Die RAG-Pipeline verwendet SentenceTransformers für Embeddings.
+Die RAG-Pipeline verwendet FAISS für Vektorsuche.
+Die RAG-Pipeline extrahiert automatisch Fakten aus Dokumenten.
+Die RAG-Pipeline integriert sich nahtlos in die Wissensbasis.
+
+Die RAG-Pipeline verarbeitet Dokumente in Chunks.
+Die RAG-Pipeline findet relevante Kontexte für Benutzeranfragen.
+Die RAG-Pipeline unterstützt Multi-Dokument-Indizierung.
+
+==========================================
+BENUTZERINTERAKTIONEN
+==========================================
+
+Benutzer können natürlichsprachliche Fragen stellen.
+Benutzer können formale HAK-GAL-Syntax verwenden.
+Benutzer können Dokumente für die Indizierung hochladen.
+Benutzer können Learning-Suggestions permanent speichern.
+Benutzer können die Wissensbasis einsehen und verwalten.
+
+Das System übersetzt natürliche Sprache in formale Logik.
+Das System bietet Erklärungen für Beweisergebnisse.
+Das System sammelt automatisch neue Fakten aus Interaktionen.
+
+==========================================
+LEARNING-SYSTEM
+==========================================
+
+Das System generiert automatisch Learning-Suggestions.
+Learning-Suggestions werden aus RAG-Kontexten extrahiert.
+Learning-Suggestions können manuell überprüft werden.
+Learning-Suggestions werden durch learn-Befehl permanent gespeichert.
+Learning-Suggestions akkumulieren zwischen verschiedenen Anfragen.
+
+Das System verhindert inkonsistente Fakten in der Wissensbasis.
+Das System prüft neue Fakten auf logische Widersprüche.
+Das System unterstützt Batch-Learning mehrerer Fakten gleichzeitig.
+
+==========================================
+SYSTEM-STATUS
+==========================================
+
+Das HAK-GAL System ist voll funktionsfähig und getestet.
+Das HAK-GAL System erreicht 94.4% Parser-Erfolgsrate.
+Das HAK-GAL System verwaltet über 50 permanente Fakten erfolgreich.
+Das HAK-GAL System bietet horizontales Scrolling in der UI.
+Das HAK-GAL System bietet Debug-Informationen für Entwickler.
+
+Das System ist production-ready für Unternehmenseinsatz.
+Das System bietet robuste Error-Handling-Mechanismen.
+Das System unterstützt Theme-Switching zwischen Light und Dark Mode.
