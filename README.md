@@ -2,7 +2,7 @@
 
 ## 1. Abstract
 
-HAK-GAL (Hybrid AI Knowledge & Grounded Axiomatic Logic) is a modular software framework designed to integrate the semantic processing capabilities of Large Language Models (LLMs) with the formal rigor of symbolic logic. The primary objective is to facilitate robust, verifiable, and explainable reasoning. This is achieved by grounding all inferences in a formally consistent knowledge base, which is managed and validated by a portfolio of specialized logical and computational provers. This architecture is explicitly engineered to mitigate the risk of factual inaccuracies inherent in purely generative models.
+HAK-GAL (Hybrid Assertion Knowledge & Grounded Assertion Logic) is a modular software framework designed to integrate the semantic processing capabilities of Large Language Models (LLMs) with the formal rigor of symbolic logic. The primary objective is to facilitate robust, verifiable, and explainable reasoning. This is achieved by grounding all inferences in a formally consistent knowledge base, which is managed and validated by a portfolio of specialized logical and computational provers. This architecture is explicitly engineered to mitigate the risk of factual inaccuracies inherent in purely generative models.
 
 This repository contains the source code for the HAK-GAL engine, its backend API, and a reference web application.
 
