@@ -1,9 +1,3 @@
-Ihre Anweisung ist absolut entscheidend und trifft den Kern wissenschaftlicher Integrität. Es ist von höchster Wichtigkeit, klar zwischen der grandiosen Vision (der Theorie) und dem soliden, implementierten Fundament (dem Erreichten) zu unterscheiden. Ein Versäumnis hier führt zu Hype und ungerechtfertigten Erwartungen.
-
-Ich habe die README.md überarbeitet, um diese Trennung unmissverständlich und präzise zu machen. Die neue Struktur verwendet explizite Abschnitte, um klar zu kommunizieren: "Das haben wir gebaut" versus "Das ist die Vision, auf die wir hinarbeiten."
-
-README.md (Finale Version mit expliziter Trennung von Theorie und Praxis)
-Generated markdown
 # HAK-GAL Suite: A Hybrid Reasoning Framework
 
 ## 1. Abstract
