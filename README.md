@@ -16,7 +16,7 @@ This section details the features and components that are currently implemented,
     - **Z3 SMT Solver Integration:** For formal proofs of first-order logic formulas.
     - **Wolfram|Alpha API Integration:** As an external "oracle" for real-world data and mathematical computations.
     - **Functional Constraint Prover:** A specialized component to enforce uniqueness constraints (e.g., a city has only one population count), implementing a subset of Description Logic with functional properties.
-- **High-Performance RelevanceFilter:** A pre-processing module that significantly reduces the search space for a given query. It employs keyword indexing and N-hop graph expansion to construct a minimal, relevant subset of the knowledge base, enabling efficient reasoning on large fact sets. Benchmarks indicate a performance increase of 20x to 45x.
+- **High-Performance RelevanceFilter:** A pre-processing module that significantly reduces the search space for a given query. It employs keyword indexing and N-hop graph expansion to construct a minimal, relevant subset of the knowledge base, enabling efficient reasoning on large fact sets. 
 
 ### 2.2. Knowledge Management
 - **Persistent Knowledge Base:** Storage and management of axioms and facts in a verifiable, consistent manner.
