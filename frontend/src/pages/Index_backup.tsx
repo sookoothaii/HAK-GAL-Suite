@@ -1,4 +1,4 @@
-// Index.tsx - Korrigierte Version mit Wolfram Status
+// Index.tsx - Korrigierte Version mit Horizontal Scrolling
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -34,40 +34,11 @@ const Index = () => {
   const [ragContext, setRagContext] = useState("No context loaded yet.");
   const [llmStatus, setLlmStatus] = useState<{llm_count: number, llm_active: number, llm_providers: any[]}>({llm_count: 0, llm_active: 0, llm_providers: []});
   
-  // NEUE: Wolfram Status State
-  const [wolframLoaded, setWolframLoaded] = useState<boolean>(false);
-  
   const conversationEndRef = useRef<null | HTMLDivElement>(null);
 
   useEffect(() => {
     conversationEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [conversationHistory]);
-
-  // Initial check für Wolfram Status
-  useEffect(() => {
-    checkWolframStatus();
-  }, []);
-
-  const checkWolframStatus = async () => {
-    try {
-      const response = await fetch("http://localhost:5001/api/command", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ command: "status" }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        // Prüfe ob Wolfram in der chatResponse erwähnt wird
-        if (data.chatResponse && data.chatResponse.includes("Wolfram|Alpha Orakel")) {
-          setWolframLoaded(true);
-          console.log("✅ Wolfram detected in prover list");
-        }
-      }
-    } catch (error) {
-      console.error("Failed to check Wolfram status:", error);
-    }
-  };
 
   // DEBUG: Log State-Änderungen
   useEffect(() => {
@@ -132,15 +103,6 @@ const Index = () => {
       });
 
       if (data.status === "success") {
-        // WOLFRAM CHECK: Prüfe ob Wolfram in Response erwähnt wird
-        if (data.chatResponse && (
-          data.chatResponse.includes("Wolfram|Alpha Orakel") ||
-          data.chatResponse.includes("Wolfram") ||
-          data.chatResponse.includes("wolfram_stats")
-        )) {
-          setWolframLoaded(true);
-        }
-        
         console.log("🔄 Updating permanentKnowledge...");
         const newKnowledge = Array.isArray(data.permanentKnowledge) ? data.permanentKnowledge : [];
         setPermanentKnowledge(newKnowledge);
@@ -301,7 +263,7 @@ const Index = () => {
         </div>
       </div>
 
-      {/* Debug Panel - FIXED mit Wolfram Status */}
+      {/* Debug Panel - FIXED */}
       <div 
         className="flex-shrink-0 border-b px-4 py-2 text-xs"
         style={{ 
@@ -310,7 +272,7 @@ const Index = () => {
           color: theme.colors.textSecondary
         }}
       >
-        🔧 DEBUG: Messages: {conversationHistory.length} | Knowledge: {permanentKnowledge.length} | Suggestions: {learningSuggestions.length} | Docs: {dataSources.length} | RAG: {ragContext.length > 50 ? "loaded" : "empty"} | Wolfram: {wolframLoaded ? "YES" : "NO"}
+        🔧 DEBUG: Messages: {conversationHistory.length} | Knowledge: {permanentKnowledge.length} | Suggestions: {learningSuggestions.length} | Docs: {dataSources.length} | RAG: {ragContext.length > 50 ? "loaded" : "empty"} | Loading: {isLoading ? "YES" : "NO"}
         <button 
           onClick={() => console.log("Current State:", { 
             conversationHistory: conversationHistory.length, 
@@ -337,13 +299,6 @@ const Index = () => {
           style={{ backgroundColor: theme.colors.success + '20' }}
         >
           Test Commands
-        </button>
-        <button 
-          onClick={() => sendCommandToBackend("wolfram_stats")}
-          className="ml-2 px-2 py-1 rounded hover:opacity-80"
-          style={{ backgroundColor: theme.colors.accent + '20' }}
-        >
-          Wolfram Check
         </button>
       </div>
       

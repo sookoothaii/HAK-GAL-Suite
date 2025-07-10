@@ -1,0 +1,42 @@
+# Mini-Geographie-Datenbank (Fakten, jeweils eine Zeile pro Beziehung)
+# Syntax: Hauptstadt(Land, Stadt).
+#         Einwohner(Stadt, Anzahl).
+#         LandKontinent(Land, Kontinent).
+#         Amtssprache(Land, Sprache).
+#         Wahrzeichen(Stadt, Wahrzeichen).
+
+Hauptstadt(Deutschland, Berlin).
+Hauptstadt(Frankreich, Paris).
+Hauptstadt(Spanien, Madrid).
+Hauptstadt(Italien, Rom).
+Hauptstadt(Österreich, Wien).
+Hauptstadt(Schweiz, Bern).
+Hauptstadt(Polen, Warschau).
+Hauptstadt(Niederlande, Amsterdam).
+Hauptstadt(Russland, Moskau).
+Hauptstadt(USA, WashingtonDC).
+
+Einwohner(Berlin, 3669491).
+Einwohner(Paris, 2148271).
+Einwohner(Madrid, 3266126).
+Einwohner(Rom, 2873000).
+Einwohner(Wien, 1911191).
+
+LandKontinent(Deutschland, Europa).
+LandKontinent(Brasilien, Südamerika).
+LandKontinent(Ägypten, Afrika).
+LandKontinent(Japan, Asien).
+
+Amtssprache(Deutschland, Deutsch).
+Amtssprache(Frankreich, Französisch).
+Amtssprache(Spanien, Spanisch).
+Amtssprache(Italien, Italienisch).
+Amtssprache(USA, Englisch).
+
+Wahrzeichen(Berlin, BrandenburgerTor).
+Wahrzeichen(Paris, Eiffelturm).
+Wahrzeichen(Rom, Kolosseum).
+Wahrzeichen(Wien, Stephansdom).
+Wahrzeichen(Moskau, Kreml).
+
+# Ende der Datei

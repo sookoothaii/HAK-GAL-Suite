@@ -1,0 +1,88 @@
+**HAK/GAL Framework: Umfassende Wissensbasis und technische Spezifikation**
+
+**Sektion 1: Grundlegende Architektur und Philosophie**
+
+Das HAK-GAL Framework, definiert als Hybrid AI Knowledge - Grounded Axiomatic Logic, ist ein System zur Integration von subsymbolischen und symbolischen KI-Methoden. Das primäre Ziel ist die Schaffung einer verifizierbaren und nachvollziehbaren Wissensverarbeitung. Jede Komponente des Systems muss diesem Grundsatz der Transparenz folgen. Das System kombiniert neuronale Sprachmodelle mit formalen Logik-Solvern. Diese Kombination ist entscheidend für seine Funktionalität.
+
+HAK-GAL ist ein Hybrid-KI-System. Ein Hybrid-KI-System ist definiert als ein System, das neuronale und symbolische Ansätze verbindet. Die symbolische Komponente sorgt für Rigorosität, während die neuronale Komponente die Verarbeitung natürlicher Sprache ermöglicht.
+
+Die Architektur ist modular aufgebaut. Die Modularität ist eine wesentliche Eigenschaft für die Wartbarkeit und Erweiterbarkeit. Die Kernkomponenten sind: der KnowledgeGraph, der EnsembleManager, die RAGPipeline und das ProverPortfolio. Jede dieser Komponenten ist ein Teil des Gesamtsystems.
+
+---
+**Sektion 2: Der KnowledgeGraph - Das Herz des Systems**
+
+Der KnowledgeGraph ist die zentrale Instanz für die Speicherung von Fakten. Er speichert Informationen in Form von TemporalFacts. Ein TemporalFact ist ein Quadrupel bestehend aus Formel, Zeitstempel, Quelle und Konfidenz. Jeder Fakt, der in den KnowledgeGraph aufgenommen wird, muss eine logische Konsistenzprüfung durchlaufen. Dies ist erforderlich, um die Integrität der Wissensbasis zu wahren. Ein inkonsistenter Fakt darf nicht hinzugefügt werden.
+
+Die Konsistenzprüfung wird vom HAKGAL_Core_FOL Modul durchgeführt. Wenn ein neuer Fakt F hinzugefügt wird, prüft das System, ob -F bereits aus der bestehenden Wissensbasis beweisbar ist. Dies verhindert logische Widersprüche.
+
+Die Wissensbasis verwendet eine kanonische Form für alle Entitäten. Beispielsweise wird "RAG-Pipeline" intern immer zu "RAGPipeline" normalisiert. Diese Normalisierung muss auf alle eingehenden Fakten und Anfragen angewendet werden.
+
+Fakten können unterschiedliche Quellen haben:
+- Quelle "manual": Manuell durch einen Benutzer hinzugefügt.
+- Quelle "rag_extraction": Automatisch aus einem Dokument extrahiert.
+- Quelle "abduction": Als Hypothese vom System generiert.
+
+---
+**Sektion 3: Die RAG-Pipeline - Brücke zu unstrukturiertem Wissen**
+
+Die RAG-Pipeline, oder Retrieval-Augmented Generation, ist verantwortlich für die Indizierung externer Dokumente. Die Indizierung ist der Prozess der Umwandlung von Text in durchsuchbare Vektoren. Die RAGPipeline ist eine Hauptkomponente des HAK-GAL Frameworks.
+
+Der Prozess der RAG-Pipeline umfasst mehrere Schritte:
+1.  Dokumenten-Chunking: Das Dokument wird in kleine, semantisch kohärente Abschnitte zerlegt.
+2.  Embedding-Generierung: Jeder Chunk wird durch ein Sentence-Transformer-Modell in einen Vektor umgewandelt.
+3.  Vektor-Speicherung: Die Vektoren werden in einer FAISS-Datenbank gespeichert. FAISS ist eine Bibliothek für die effiziente Ähnlichkeitssuche.
+
+Die RAG-Pipeline muss in der Lage sein, verschiedene Dokumentenformate zu verarbeiten, insbesondere PDF und TXT. Jede Anfrage in natürlicher Sprache sollte zuerst die RAG-Pipeline durchlaufen, um relevanten Kontext zu finden. Dieser Kontext wird dann zur Faktenextraktion verwendet. Die Faktenextraktion aus RAG-Kontext ist eine zentrale Funktion des EnsembleManagers.
+
+Eine wichtige Regel besagt: Wenn die RAG-Pipeline relevanten Kontext findet, müssen die daraus extrahierten Fakten als temporäre Annahmen für den Beweisprozess verwendet werden. Dies erhöht die Antwortqualität erheblich.
+
+---
+**Sektion 4: Der EnsembleManager und die LLM-Integration**
+
+Der EnsembleManager verwaltet ein Portfolio von verschiedenen Large Language Models (LLMs). Derzeit werden folgende Provider unterstützt: Mistral, DeepSeek und Google Gemini. Die Unterstützung mehrerer Provider macht das System resilient gegenüber dem Ausfall eines einzelnen Dienstes.
+
+Die Hauptaufgabe des EnsembleManagers ist die Übersetzung von natürlicher Sprache in HAK-GAL-Logik (Logicalize) und die Extraktion von Fakten aus Text (Extract Facts). Der Logicalize-Prozess sollte deterministisch sein und immer eine einzelne, syntaktisch korrekte Formel zurückgeben. Falls ein LLM eine gesprächige oder ungültige Antwort gibt, muss das System dies erkennen und ablehnen.
+
+Der Faktenextraktionsprozess verwendet eine Veto-Strategie. Wenn der Mistral-Provider ein Ergebnis liefert, wird dieses bevorzugt. Wenn nicht, wird ein Mehrheitsentscheid unter den verbleibenden Providern durchgeführt. Dies erhöht die Qualität und Zuverlässigkeit der extrahierten Fakten.
+
+---
+**Sektion 5: Das Prover-Portfolio - Das Rückgrat der Verifikation**
+
+Das Beweissystem von HAK-GAL ist als Portfolio verschiedener Prover aufgebaut. Jede Anfrage wird von einem intelligenten Scheduler an den am besten geeigneten Prover delegiert.
+
+Die Prover im Portfolio sind:
+- **PatternMatcher**: Ein einfacher und sehr schneller Prover. Er prüft auf exakte Übereinstimmungen und direkte Widersprüche in der Wissensbasis.
+- **Z3_SMT_Solver**: Ein leistungsfähiger SMT-Solver von Microsoft. Z3 ist in der Lage, komplexe prädikatenlogische Formeln zu beweisen und Gegenmodelle zu finden. Der Z3_SMT_Solver ist die wichtigste Komponente für rigorose logische Beweise.
+- **WolframAlpha_Orakel**: Dient als Schnittstelle zu externem, kuratiertem Weltwissen und für numerische Berechnungen. Das WolframAlpha_Orakel beweist keine logischen Regeln, sondern validiert atomare Fakten.
+
+Eine Regel für das Portfolio lautet: Wenn eine Anfrage als "knowledge" oder "computation" klassifiziert wird, muss der WolframAlpha_Orakel Prover priorisiert werden. Logische Anfragen mit Quantoren hingegen sollten immer an den Z3_SMT_Solver gehen. Der PatternMatcher sollte immer als erster, schneller Filter laufen.
+
+---
+**Sektion 6: Spezifische Regeln und Fakten des HAK-GAL Systems**
+
+- HAK-GAL ist ein Framework.
+- Der Z3-SMT-Solver ist eine Komponente von HAK-GAL.
+- Die RAG-Pipeline ist eine Komponente von HAK-GAL.
+- Der EnsembleManager ist eine Komponente von HAK-GAL.
+- Wenn eine Komponente kritisch ist, dann muss sie überwacht werden.
+- Die RAG-Pipeline ist definiert als eine kritische Komponente.
+- Der KnowledgeGraph ist ebenfalls eine kritische Komponente.
+- Jede kritische Komponente muss robust gegen Fehler sein.
+- Die Verarbeitung von PDF-Dokumenten ist eine Fähigkeit der RAG-Pipeline.
+- Das Extrahieren von Fakten ist eine Fähigkeit des EnsembleManagers.
+- Formale Beweise sind eine Fähigkeit des Z3-SMT-Solvers.
+- Die Überprüfung von Weltwissen ist eine Fähigkeit des WolframAlpha_Orakels.
+- Die Normalisierung von Entitäten ist erforderlich für die Konsistenz der Wissensbasis.
+- Der `review`-Befehl ermöglicht die menschliche Validierung von extrahierten Fakten.
+- Der `build_kb`-Befehl startet die DocumentIngestionPipeline.
+- Die DocumentIngestionPipeline verwendet den EnsembleManager.
+- Die DocumentIngestionPipeline nutzt Sentence-Transformers zur Deduplizierung.
+
+**Anwendungsgebiete**
+Das HAK-GAL Framework hat mehrere Anwendungsgebiete:
+- Compliance-Checking: Überprüfung von Aktionen gegen ein formales Regelwerk.
+- Wissenschaftliche Verifikation: Überprüfung von Hypothesen gegen eine Wissensbasis aus Fachliteratur.
+- Automatisierte Faktenfindung: Aufbau großer, konsistenter Wissensdatenbanken.
+- Logische Konsistenzprüfung von komplexen Systemen.
+
+Jedes dieser Anwendungsgebiete erfordert eine große und präzise Wissensbasis. Der Erfolg des Systems hängt direkt von der Qualität der zugrundeliegenden Daten ab.
