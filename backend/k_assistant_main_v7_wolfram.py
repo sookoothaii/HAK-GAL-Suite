@@ -275,6 +275,21 @@ class WolframProver(BaseProver):
         """Einfache HAK-GAL zu natürlicher Sprache Übersetzung"""
         formula = formula.strip().removesuffix('.')
         
+        # SPEZIAL: Variable-Handling für Wolfram
+        if ', x)' in formula or ', y)' in formula or ', z)' in formula:
+            # Einwohner(Wien, x) -> "population of Vienna"
+            if 'Einwohner(' in formula:
+                match = re.search(r'Einwohner\(([^,]+),', formula)
+                if match:
+                    city = match.group(1).lower()
+                    return f"population of {city}"
+            # Hauptstadt(x, Berlin) -> "country with capital Berlin"
+            if 'Hauptstadt(' in formula and 'Hauptstadt(x' in formula:
+                match = re.search(r'Hauptstadt\(x,\s*([^)]+)\)', formula)
+                if match:
+                    city = match.group(1)
+                    return f"country with capital {city}"
+        
         # SPEZIAL-BEHANDLUNG für fehlerhafte Eingaben
         if 'HauptstadtvonEnglandist(' in formula:
             # Extrahiere den Parameter aus HauptstadtvonEnglandist(London)
@@ -378,7 +393,8 @@ class ComplexityAnalyzer:
             "Bevölkerungsdichte", "HauptstadtVon", "WetterIn", "TemperaturIn",
             "Integral", "AbleitungVon", "WährungVon", "FlächeVon", "Bevölkerung",
             "ZeitzoneVon", "AktuelleZeit", "Umrechnung", "Einheit", "Lösung",
-            "Faktorisierung", "IstGroesserAls", "IstKleinerAls"
+            "Faktorisierung", "IstGroesserAls", "IstKleinerAls",
+            "Einwohner", "Hauptstadt"  # NEU: Explizit als Oracle-Prädikate
         }
         
         # Pattern für Oracle-Erkennung via Regex
@@ -529,6 +545,9 @@ class ComplexityAnalyzer:
         # Oracle-Anfragen -> Wolfram zuerst
         if requires_oracle and WOLFRAM_INTEGRATION:
             recommended.append("Wolfram|Alpha Orakel")
+        
+        # Funktionale Constraints -> Spezialisierter Prover zuerst
+        recommended.append("Functional Constraint Prover")
         
         # Logische Anfragen -> Z3
         if query_type in [QueryType.LOGIC, QueryType.MIXED]:
@@ -726,6 +745,60 @@ class GeminiProvider(BaseLLMProvider):
         response = self.model.generate_content(full_prompt, generation_config=genai.types.GenerationConfig(temperature=temperature))
         return response.text.strip()
 
+class FunctionalConstraintProver(BaseProver):
+    """
+    Spezialisierter Prover für funktionale Constraints
+    Behandelt Fälle wie Einwohner(X, Y) wo Y eindeutig sein muss
+    """
+    
+    def __init__(self):
+        super().__init__("Functional Constraint Prover")
+        self.functional_predicates = {
+            'Einwohner', 'Hauptstadt', 'Bevölkerung', 'Fläche', 
+            'Temperatur', 'Geburtsjahr', 'LiegtIn'
+        }
+    
+    def prove(self, assumptions: list, goal: str) -> tuple[Optional[bool], str]:
+        # Extrahiere Prädikat und Argumente aus dem Ziel
+        goal_clean = goal.strip().rstrip('.')
+        goal_match = re.match(r'([A-ZÄÖÜ][\w]*)\(([^)]+)\)', goal_clean)
+        if not goal_match:
+            return None, f"{self.name}: Kein atomares Prädikat erkannt in '{goal_clean}'"
+        
+        goal_predicate, goal_args = goal_match.groups()
+        goal_arg_list = [arg.strip() for arg in goal_args.split(',')]
+        
+        # Nur funktionale Prädikate behandeln
+        if goal_predicate not in self.functional_predicates:
+            return None, f"{self.name}: '{goal_predicate}' ist nicht funktional"
+        
+        # Suche nach widersprüchlichen Fakten in Assumptions
+        for assumption in assumptions:
+            assume_clean = assumption.strip().rstrip('.')
+            assume_match = re.match(r'([A-ZÄÖÜ][\w]*)\(([^)]+)\)', assume_clean)
+            if not assume_match:
+                continue
+            
+            assume_predicate, assume_args = assume_match.groups()
+            assume_arg_list = [arg.strip() for arg in assume_args.split(',')]
+            
+            # Gleicher Prädikatname und gleiche erste Argumente?
+            if (assume_predicate == goal_predicate and 
+                len(assume_arg_list) == len(goal_arg_list) and
+                len(assume_arg_list) >= 2):
+                
+                # Prüfe ob erste n-1 Argumente gleich sind, aber letztes unterschiedlich
+                if (assume_arg_list[:-1] == goal_arg_list[:-1] and
+                    assume_arg_list[-1] != goal_arg_list[-1]):
+                    
+                    # FUNKTIONALER WIDERSPRUCH!
+                    return False, f"{self.name}: Funktionaler Widerspruch - {goal_predicate} kann für {assume_arg_list[:-1]} nicht sowohl {assume_arg_list[-1]} als auch {goal_arg_list[-1]} sein"
+        
+        return None, f"{self.name}: Kein funktionaler Widerspruch gefunden"
+    
+    def validate_syntax(self, formula: str) -> tuple[bool, str]:
+        return HAKGALParser().parse(formula)[0::2]
+
 class PatternProver(BaseProver):
     def __init__(self):
         super().__init__("Pattern Matcher")
@@ -756,6 +829,18 @@ class Z3Adapter(BaseProver):
                         if s.startswith(op, i): return i, op
             return -1, None
         expr = formula_str.strip()
+        
+        # GLEICHHEIT: Spezialbehandlung für = Operator
+        if '=' in expr and not any(op in expr for op in ['->', '|', '&']):
+            parts = expr.split('=')
+            if len(parts) == 2:
+                left = parts[0].strip()
+                right = parts[1].strip()
+                # Konvertiere beide Seiten zu Z3 Integers
+                left_z3 = z3.Int(left) if left in quantified_vars else z3.Int(left)
+                right_z3 = z3.Int(right) if right in quantified_vars else z3.Int(right)
+                return left_z3 == right_z3
+        
         op_map = {'->': z3.Implies, '|': z3.Or, '&': z3.And}
         for op_str, op_func in op_map.items():
             idx, op = _find_top_level_operator(expr, [op_str])
@@ -763,6 +848,8 @@ class Z3Adapter(BaseProver):
         if expr.startswith('-'): return z3.Not(self._parse_hakgal_formula_to_z3_expr(expr[1:], quantified_vars))
         if expr.startswith('all '):
             match = re.match(r"all\s+([\w]+)\s+\((.*)\)$", expr, re.DOTALL)
+            if not match:
+                raise ValueError(f"Ungültiges Quantifikator-Format: '{expr}'")
             var_name, body = match.groups()
             z3_var = z3.Int(var_name)
             return z3.ForAll([z3_var], self._parse_hakgal_formula_to_z3_expr(body, quantified_vars | {var_name}))
@@ -1017,7 +1104,7 @@ class HAKGAL_Core_FOL:
 
     def _initialize_provers(self):
         """Initialisiert verfügbare Prover"""
-        self.provers = [PatternProver(), Z3Adapter()]
+        self.provers = [FunctionalConstraintProver(), PatternProver(), Z3Adapter()]
         
         # Wolfram-Prover hinzufügen wenn verfügbar
         if WOLFRAM_INTEGRATION:
@@ -1044,10 +1131,19 @@ class HAKGAL_Core_FOL:
         return False
 
     def check_consistency(self, new_fact: str) -> Tuple[bool, Optional[str]]:
+        # 1. Prüfe ob Negation bereits beweisbar ist
         negated_fact = f"-{new_fact}" if not new_fact.startswith('-') else new_fact[1:]
         is_contradictory, reason = self.verify_logical(negated_fact, self.K)
         if is_contradictory:
             return (False, f"Widerspruch! Neuer Fakt '{new_fact}' widerspricht KB ({reason})")
+        
+        # 2. NEUE PRÜFUNG: Teste funktionale Widersprüche direkt
+        functional_prover = next((p for p in self.provers if p.name == "Functional Constraint Prover"), None)
+        if functional_prover:
+            success, reason = functional_prover.prove(self.K, new_fact)
+            if success is False:  # Funktionaler Widerspruch erkannt
+                return (False, f"Funktionaler Widerspruch! {reason}")
+        
         return (True, None)
 
     def verify_logical(self, query_str: str, full_kb: list) -> tuple[Optional[bool], str]:
@@ -1107,6 +1203,7 @@ class KAssistant:
         self.potential_new_facts: List[str] = []
         self.load_kb(kb_filepath)
         self._add_system_facts()
+        self._add_functional_constraints()  # NEU: Funktionale Constraints
         prover_names = ', '.join([p.name for p in self.core.provers])
         print(f"--- Prover-Portfolio (Archon-Prime): {prover_names} ---")
         print(f"--- Parser-Modus: {'Lark' if self.parser.parser_available else 'Regex-Fallback'} ---")
@@ -1145,6 +1242,34 @@ class KAssistant:
         for fact in system_facts:
             if fact not in self.core.K: self.core.K.append(fact)
         print(f"   ✅ {len(system_facts)} Systemfakten hinzugefügt.")
+    
+    def _add_functional_constraints(self):
+        """Fügt funktionale Constraints für eindeutige Relationen hinzu"""
+        functional_constraints = [
+            # Eine Stadt hat nur EINE Einwohnerzahl
+            "all x all y all z ((Einwohner(x, y) & Einwohner(x, z)) -> (y = z)).",
+            # Ein Land hat nur EINE Hauptstadt  
+            "all x all y all z ((Hauptstadt(x, y) & Hauptstadt(x, z)) -> (y = z)).",
+            # Eine Stadt liegt nur in EINEM Land
+            "all x all y all z ((LiegtIn(x, y) & LiegtIn(x, z)) -> (y = z)).",
+            # Ein Objekt hat nur EINE Fläche
+            "all x all y all z ((Fläche(x, y) & Fläche(x, z)) -> (y = z)).",
+            # Bevölkerung ist auch funktional
+            "all x all y all z ((Bevölkerung(x, y) & Bevölkerung(x, z)) -> (y = z)).",
+            # Eine Person hat nur EIN Geburtsjahr
+            "all x all y all z ((Geburtsjahr(x, y) & Geburtsjahr(x, z)) -> (y = z)).",
+            # Eine Stadt hat nur EINE Temperatur (zu einem Zeitpunkt)
+            "all x all y all z ((Temperatur(x, y) & Temperatur(x, z)) -> (y = z))."
+        ]
+        
+        added = 0
+        for constraint in functional_constraints:
+            if constraint not in self.core.K:
+                self.core.K.append(constraint)
+                added += 1
+        
+        if added > 0:
+            print(f"   ✅ {added} funktionale Constraints hinzugefügt.")
     
     def _ask_or_explain(self, q: str, explain: bool, is_raw: bool):
         print(f"\n> {'Erklärung für' if explain else 'Frage'}{' (roh)' if is_raw else ''}: '{q}'")

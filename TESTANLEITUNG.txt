@@ -1,0 +1,41 @@
+🚀 KRITISCHER TEST für das EINWOHNER-PROBLEM
+===============================================
+
+Das ursprüngliche Problem war:
+- KB: Einwohner(Rom,2873000).
+- Anfrage: Einwohner(Rom,283000).
+- Ergebnis: "Unbekannt" ❌
+- Erwartet: "FALSCH" ✅
+
+TESTE FOLGENDE SCHRITTE:
+
+1. Starte das System:
+   cd "D:\MCP Mods\HAK_GAL_SUITE\backend"
+   python k_assistant_main_v7_wolfram.py
+
+2. Füge Einwohner-Fakt hinzu:
+   add_raw Einwohner(Rom,2873000).
+
+3. Teste korrekten Fakt (sollte JA ergeben):
+   ask_raw Einwohner(Rom,2873000).
+
+4. 🚨 KRITISCHER TEST (sollte NEIN/FALSCH ergeben):
+   ask_raw Einwohner(Rom,283000).
+
+5. Teste Status der funktionalen Constraints:
+   show
+
+6. Prüfe ob Constraints aktiv sind:
+   Suche nach Zeilen mit "all x all y all z ((Einwohner(x, y) & Einwohner(x, z)) -> (y = z))."
+
+ERWARTETES VERHALTEN:
+- Schritt 3: ✅ Antwort: Ja
+- Schritt 4: ✅ Antwort: Nein (wegen funktionalem Constraint)
+- Schritt 6: Constraint sollte in KB sichtbar sein
+
+FALLS ES IMMER NOCH "UNBEKANNT" ZURÜCKGIBT:
+Das bedeutet, dass Z3 die Gleichheits-Constraints nicht richtig verarbeitet.
+
+SCHNELL-FIX FALLBACK:
+Falls Z3 versagt, manuell hinzufügen:
+add_raw -Einwohner(Rom,283000).
